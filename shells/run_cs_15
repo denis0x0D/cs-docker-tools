@@ -10,8 +10,8 @@
 #MDB_BUILD_TYPE=release
 MDB_BUILD_TYPE=debug
 #BUILD_TYPE=debug
-DISTRO=$1
-MCS_SCRIPTS_REPO_PREFIX=/data/cs-docker-tools
+DISTRO='focal'
+MCS_SCRIPTS_REPO_PREFIX=`pwd`/cs-docker-tools
 MDB_SOURCE_PATH=/data/mdb-server
 MCS_SOURCE_PATH=$MDB_SOURCE_PATH/storage/columnstore
 MCS_CONFIG_DIR=/etc/columnstore
@@ -37,7 +37,7 @@ elif [ $DISTRO = 'focal' ]; then
     apt-get -y install build-essential automake libboost-all-dev bison cmake \
     libncurses5-dev libreadline-dev \
     libperl-dev libssl-dev libxml2-dev libkrb5-dev flex libpam-dev git \
-    libreadline-dev libsnappy-dev libcurl4-openssl-dev
+    libreadline-dev libsnappy-dev libcurl4-openssl-dev libaio-dev
 elif [ $DISTRO = 'centos' ]; then
     yum -y install epel-release \
     && yum -y groupinstall "Development Tools" \
@@ -77,16 +77,16 @@ rm -f /var/lib/columnstore/storagemanager/cs-initialized
 
 MCS_TMP_DIR=/tmp/columnstore_tmp_files
 TMP_PATH=/tmp
-CPUS=$(getconf _NPROCESSORS_ONLN)
+CPUS=1
 
 # script
 rm -rf $MCS_TMP_DIR/*
 rm -rf /var/lib/mysql
 
 cd $MDB_SOURCE_PATH
-if [[ "$DISTRO" = 'bionic' || "$DISTRO" = 'focal' ]]; then
+if [ "$DISTRO" = 'focal' ]; then
     #MDB_CMAKE_FLAGS='-DWITH_SYSTEMD=yes -DPLUGIN_TOKUDB=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_MROONGA=NO -DPLUGIN_GSSAPI=NO -DWITH_MARIABACKUP=NO -DDEB=bionic -DPLUGIN_COLUMNSTORE=YES'
-    MDB_CMAKE_FLAGS='-DWITH_SYSTEMD=yes -DPLUGIN_COLUMNSTORE=YES -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_CONNECT=YES -DPLUGIN_SPIDER=NO -DPLUGIN_OQGRAPH=NO -DPLUGIN_SPHINX=NO -DBUILD_CONFIG=mysql_release -DWITH_WSREP=OFF -DWITH_SSL=system -DDEB=bionic'
+    MDB_CMAKE_FLAGS='-DWITH_SYSTEMD=yes -DPLUGIN_COLUMNSTORE=YES -DPLUGIN_MROONGA=NO -DPLUGIN_ROCKSDB=NO -DPLUGIN_TOKUDB=NO -DPLUGIN_CONNECT=YES -DPLUGIN_SPIDER=NO -DPLUGIN_OQGRAPH=NO -DPLUGIN_SPHINX=NO -DBUILD_CONFIG=mysql_release -DWITH_WSREP=OFF -DWITH_SSL=system -DDEB=bionici -DWITH_PCRE=bundle'
     # These flags will be available in 1.5
     #MDB_CMAKE_FLAGS="${MDB_CMAKE_FLAGS} -DWITH_GTEST=1 -DWITH_ROWGROUP_UT=1 -DWITH_DATACONVERT_UT=1 -DWITH_ARITHMETICOPERATOR_UT=1 -DWITH_ORDERBY_UT=1 -DWITH_CSDECIMAL_UT=1 -DWITH_SORTING_COMPARATORS_UT=1"
     #MDB_CMAKE_FLAGS="${MDB_CMAKE_FLAGS} -DWITH_PP_SCAN_UT=1"
